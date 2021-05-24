@@ -36,6 +36,7 @@ def edgedetect(y,step):
         grad.append(grad_i)
     grad = np.array(grad)
     return grad
+
         
 
     
