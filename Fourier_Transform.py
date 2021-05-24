@@ -38,7 +38,7 @@ from scipy.fft import fft, fftfreq
 N = SAMPLE_RATE * DURATION
 
 yf = fft(normalized_tone)
-xf = fftfreq(N, 1/sample_rate)
+xf = fftfreq(N, 1/SAMPLE_RATE)
 
 plt.plot(xf, np.abs(yf))
 plt.show()
