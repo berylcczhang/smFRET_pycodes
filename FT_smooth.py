@@ -45,15 +45,6 @@ magnitudeF = abs(F[:len(pFrequency)])   # magnitude of F for the positive freque
 #-------------------------------------------------------------------------------
 # Some functions we will need
 
-# Plots the FFT
-def pltfft():
-    plt.plot(pFrequency,magnitudeF)
-    plt.xlabel('Hz')
-    plt.ylabel('Magnitude')
-    plt.title('FFT of the full signal')
-    plt.grid(True)
-    plt.show()
-
 # Plots the full signal
 def pltCompleteSignal():
     plt.plot(t,y,'b')
@@ -63,14 +54,33 @@ def pltCompleteSignal():
     plt.grid(True)
     plt.show()
 
+
+# Plots the FFT
+def pltfft(data, N, sample_rate):
+    FT = fft(data)
+    Freq = fftfreq(N, 1/sample_rate)
+    #pFreq = np.where(Freq>0)[0]
+    magF = abs(FT[:len(pFreq)])
+    plt.plot(pFreq,magF)
+    plt.xlabel('Hz')
+    plt.ylabel('Magnitude')
+    plt.title('FFT of the full signal')
+    plt.grid(True)
+    plt.show()
+
+
 # Filter function:
 # blocks higher frequency than fmax, lower than fmin and returns the cleaned FT
-def blockHigherFreq(FT,fmin,fmax,plot=False):
+def blockHigherFreq(data, N, sample_rate, fmin, fmax, plot=False):
+    FT = fft(data)
+    Freq = fftfreq(N,1/sample_rate)
+    pFreq = np.where(Freq>0)[0]
+    magF = abs(FT[:len(pFreq)])
     for i in range(len(FT)):
         if (i>= fmax) or (i<=fmin):
             FT[i] = 0
     if plot:
-        plt.plot(pFrequency,abs(FT[:len(pFrequency)]))
+        plt.stem(pFrequency,abs(FT[:len(pFrequency)]))
         plt.xlabel('Hz')
         plt.ylabel('Magnitude')
         plt.title('Cleaned FFT')
@@ -97,23 +107,3 @@ cleanedSignal = ifft(F)
 error = normalise(y1) - normalise(cleanedSignal)
 
 #-------------------------------------------------------------------------------
-# Plot the findings
-
-pltCompleteSignal()         #Plot the full signal
-pltfft()                    #Plot fft
-
-plt.figure()
-
-plt.subplot(3,1,1)          #Subplot 1
-plt.title('Original signal')
-plt.plot(t,y,'g')
-
-plt.subplot(3,1,2)          #Subplot 2
-plt.plot(t,normalise(cleanedSignal),label='Cleaned signal',color='b')
-plt.plot(t,normalise(y1),label='Signal to find',ls='-',color='r')
-plt.title('Cleaned signal and signal to find')
-plt.legend()
-
-plt.subplot(3,1,3)          #Subplot 3
-plt.plot(t,error,color='r',label='error')
-plt.show()
