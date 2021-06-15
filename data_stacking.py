@@ -20,7 +20,6 @@ for files in data_file:
     data_stack.append(data)
 
 data_stack = np.concatenate(data_stack,axis=1)
-data_stack = data_stack[10:150,:]
 
 np.savetxt(path + '/stacked_data.dat', data_stack, fmt='%8.1f' )
 
