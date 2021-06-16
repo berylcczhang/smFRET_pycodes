@@ -16,8 +16,7 @@ from normxcorr2 import normxcorr2
 import statistics 
 import math
 
-
-
+# =============================================================================
 # define find offset function for beads file
 def find_offset(path):
     img = Image.open(path)
@@ -38,8 +37,9 @@ def find_offset(path):
     offsetx = np.where(cc==np.max(cc))[1][0]-donor.shape[1]-10+1
     offsety = np.where(cc==np.max(cc))[0][0]-donor.shape[0]-10+1
     return print('x offset = '+str(offsetx)+' and y offset = '+str(offsety))
+# =============================================================================
 
-
+# =============================================================================
 # define read .tiff data file
 def read_tiff(path):
     img = Image.open(path)
@@ -49,7 +49,9 @@ def read_tiff(path):
         images.append(np.array(img))
     data = np.array(images)
     return data
+# =============================================================================
 
+# =============================================================================
 # define background subtraction function
 def bg_subtraction(firstred, green, data):
     
@@ -78,7 +80,6 @@ def bg_subtraction(firstred, green, data):
     redbg_d = statistics.median(red_d[np.where(red_d<bg_threshold_r)])
     redbg_a = statistics.median(red_a[np.where(red_a<bg_threshold_r)])
     
-
     #bg-subtraction
     r1_a = data[:firstred,:,256:512]-redbg_a
     g_a = data[firstred:firstred+green,:,256:512]-greenbg_a
@@ -92,7 +93,9 @@ def bg_subtraction(firstred, green, data):
     data = np.dstack((donor,acceptor))
     
     return data
+# =============================================================================
 
+# =============================================================================
 # define locate molecule function
 def locate_molecules(neighborhood_size, threshold, min_distance, data):    
     firstred_avg= np.mean(data[:8,:,:],axis = 0)
@@ -122,8 +125,10 @@ def locate_molecules(neighborhood_size, threshold, min_distance, data):
     final_coords = np.delete(mole_coords,overlap_n,0)
     
     return [print('found this many molecules:' + str(final_coords.shape[0])), final_coords]
+# =============================================================================
 
-# define good molecule selection function
+# =============================================================================
+# define good molecule selection function with coeffcient criteria
 def get_goodones(offsetx, offsety, final_coords, data):
     A_map = np.zeros((512,256)).astype(bool)
     D_map = np.zeros((512,256)).astype(bool)
@@ -168,5 +173,46 @@ def get_goodones(offsetx, offsety, final_coords, data):
     # get the indices of the lowest coeff. for the molecules with the lowest coeff. below threshold
     good_mole_D_ind = min_ind[good_mole_ind]
     
-    return good_mole_ind, good_mole_D_ind
-
+    # return good_mole_ind, good_mole_D_ind
+    
+    # visualize traces
+    x = np.linspace(11,A_intensity.shape[0],A_intensity.shape[0]-10)
+    loop = good_mole_ind.size
+    pw_fret = []
+    saved_traces = []
+    
+    for i in range(loop):
+        A = np.squeeze(A_intensity[:,good_mole_ind[i]])
+        D = np.squeeze(D_intensity[good_mole_D_ind[i],:,good_mole_ind[i]])
+        
+        plt.figure(figsize=(20,4.5))
+        ax1 = plt.subplot(211)
+        plt.plot(x, A[10:],'r',linewidth=1)
+        plt.plot(x, D[10:],'b',linewidth=1)
+        plt.xlim(10,560)
+        plt.xlabel('number of frames')
+        plt.ylabel('donor/acceptor intensity')
+        plt.xticks(np.arange(10, x.shape[0]+1, 20))
+        plt.title(str(i+1)+'/'+str(loop))
+        
+        E_fret = A/(A+D)
+        ax2 = plt.subplot(212)
+        plt.plot(x,E_fret[10:],'k', linewidth=1)
+        plt.xlim(10,560)
+        plt.xlabel('number of frames')
+        plt.ylim(-0.1,1)
+        plt.ylabel('$E_{fret}$')
+        plt.xticks(np.arange(10, x.shape[0]+1, 20))
+        plt.show()
+        
+        save = input("Save or not?")
+        if str(save)=='s':
+            # framenumber = int(input("At which frame the acceptor is bleached?"))
+            # pw_fret.append(E_fret[10:framenumber])
+            saved_traces.append(D)
+            saved_traces.append(A)
+    traces_s = np.array(saved_traces).transpose()
+    np.savetxt('XX/XX/proteinname_tracesXX_good.dat', traces_s, fmt='%8.1f')
+# =============================================================================
+# 
+# =============================================================================
