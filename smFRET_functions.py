@@ -13,6 +13,10 @@ import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 import matplotlib.pyplot as plt
 from normxcorr2 import normxcorr2
+import statistics 
+import math
+
+
 
 # define find offset function for beads file
 def find_offset(path):
@@ -90,8 +94,7 @@ def bg_subtraction(firstred, green, data):
     return data
 
 # define locate molecule function
-def locate_molecules(neighborhood_size, threshold, min_distance):
-    
+def locate_molecules(neighborhood_size, threshold, min_distance, data):    
     firstred_avg= np.mean(data[:8,:,:],axis = 0)
     max_mask = filters.maximum_filter(firstred_avg, neighborhood_size)
     min_mask = filters.minimum_filter(firstred_avg, neighborhood_size)
@@ -121,7 +124,7 @@ def locate_molecules(neighborhood_size, threshold, min_distance):
     return [print('found this many molecules:' + str(final_coords.shape[0])), final_coords]
 
 # define good molecule selection function
-def get_goodones(offsetx, offsety, final_coords):
+def get_goodones(offsetx, offsety, final_coords, data):
     A_map = np.zeros((512,256)).astype(bool)
     D_map = np.zeros((512,256)).astype(bool)
     A_map[final_coords[:,0],final_coords[:,1]] = True
