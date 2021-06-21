@@ -212,7 +212,8 @@ def get_goodones(offsetx, offsety, final_coords, data):
             saved_traces.append(D)
             saved_traces.append(A)
     traces_s = np.array(saved_traces).transpose()
-    np.savetxt('XX/XX/PName_tracesNo_good.dat', traces_s, fmt='%8.1f')
+    return traces_s
+    # np.savetxt('XX/XX/PName_tracesNo_good.dat', traces_s, fmt='%8.1f')
 # =============================================================================
 # 
 # =============================================================================

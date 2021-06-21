@@ -53,8 +53,30 @@ def pruning(data):
         ax1.plot(x, D[10:],'b',linewidth=1)
         E_fret = A/(A+D)
         ax2.plot(x,E_fret[10:],'k', linewidth=1)
-      
+        plt.show()
+        
         framenumber = int(input("At which frame the acceptor is bleached?"))
         pw_fret.append(E_fret[10:framenumber])
         pruned_traces.append(D[10:framenumber])
         pruned_traces.append(A[10:framenumber])
+
+    pw_fret_all = np.concatenate(pw_fret)
+    # np.savetxt('./Toxin/210608/ch2_TcDA_SC_pH7_lp10_210608/pwE_all.dat', pw_fret_all, fmt='%7.5f')
+    traces_p = []
+    for i in range(int(len(pruned_traces)/2)):
+        frame_len = len(pruned_traces[2*i])
+        intensity = np.array([np.ones(frame_len)*(i+1),pruned_traces[2*i],pruned_traces[2*i+1]])
+        intensity = intensity.transpose()
+        traces_p.append(intensity)
+    traces_p = np.concatenate(traces_p)
+    # traces_p.shape
+    # np.savetxt('./Toxin/210608/ch2_TcDA_SC_pH7_lp10_210608/pruned_all.dat', traces_p, fmt='%8.1f')
+    return pw_fret_all, traces_p
+
+def plot_hist(data, titlename):
+    plt.figure(figsize=(10,7))
+    plt.hist(data, bins=100, weights=np.ones(len(data))/len(data) , color='#56B4E9', edgecolor='k');
+    plt.xlabel('$E_{fret}$' ,  fontsize=18)
+    plt.ylabel('Probability' , fontsize=18)
+    plt.title(titlename)
+    plt.show()
