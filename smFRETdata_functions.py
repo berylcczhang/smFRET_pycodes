@@ -63,7 +63,7 @@ def pruning(data):
         ax2.plot(x,E_fret[10:],'k', linewidth=1)
         cursor = Cursor(ax1, horizOn=False, vertOn=True, useblit=True, color = 'r', linewidth = 1)
         fig.canvas.mpl_connect('button_press_event', onclick)
-        plt.pause(3)
+        plt.pause(5)
         # print(framenumber)
         pw_fret.append(E_fret[10:framenumber])
         pruned_traces.append(D[10:framenumber])
@@ -82,8 +82,10 @@ def pruning(data):
 # plot histgram for point-wise FRET efficiency
 # =============================================================================
 def plot_hist(data, titlename):
-    plt.figure(figsize=(10,7))
+    data = np.delete(data, np.where((data>1.4) | (data<-0.2)))
+    plt.figure(figsize=(10,5))
     plt.hist(data, bins=100, weights=np.ones(len(data))/len(data) , color='#56B4E9', edgecolor='k');
+    plt.xlim(-0.1,1.2)
     plt.xlabel('$E_{fret}$' ,  fontsize=18)
     plt.ylabel('Probability' , fontsize=18)
     plt.title(titlename)

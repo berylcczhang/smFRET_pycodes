@@ -168,7 +168,7 @@ def get_goodones(offsetx, offsety, final_coords, data):
     
     # among all the lowest coeff. values, select out the molecules with the lowest coeff. below the thershold -0.5
     # 'good_mole' is the indices of the molecules with lowest coeff. below threshold
-    good_mole_ind = np.argwhere(min_coeffs<-0.5)
+    good_mole_ind = np.argwhere(min_coeffs<-0.3)
     
     # get the indices of the lowest coeff. for the molecules with the lowest coeff. below threshold
     good_mole_D_ind = min_ind[good_mole_ind]
