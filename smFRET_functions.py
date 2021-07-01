@@ -129,7 +129,7 @@ def locate_molecules(neighborhood_size, threshold, min_distance, data):
 
 # =============================================================================
 # define good molecule selection function with coeffcient criteria
-def get_goodones(offsetx, offsety, final_coords, data):
+def get_goodones(offsetx, offsety, final_coords, data, coeffthres, corrframe):
     A_map = np.zeros((512,256)).astype(bool)
     D_map = np.zeros((512,256)).astype(bool)
     A_map[final_coords[:,0],final_coords[:,1]] = True
@@ -153,7 +153,7 @@ def get_goodones(offsetx, offsety, final_coords, data):
     coeffs = []
     for i in range(A_intensity.shape[1]):
         for j in range(9):
-            rho = np.corrcoef(D_intensity[j,10:100,i],A_intensity[10:100,i])[0,1]
+            rho = np.corrcoef(D_intensity[j,10:corrframe,i],A_intensity[10:corrframe,i])[0,1]
             coeffs.append(rho)
     coeffs = np.array(coeffs).reshape(A_intensity.shape[1],-1)
     
@@ -168,7 +168,7 @@ def get_goodones(offsetx, offsety, final_coords, data):
     
     # among all the lowest coeff. values, select out the molecules with the lowest coeff. below the thershold -0.5
     # 'good_mole' is the indices of the molecules with lowest coeff. below threshold
-    good_mole_ind = np.argwhere(min_coeffs<-0.3)
+    good_mole_ind = np.argwhere(min_coeffs < coeffthres)
     
     # get the indices of the lowest coeff. for the molecules with the lowest coeff. below threshold
     good_mole_D_ind = min_ind[good_mole_ind]
